@@ -2,10 +2,10 @@
 
 const express = require('express');
 const dotenv = require('dotenv');
-const connectDB = require('./src/config/db');
-const apiRoutes = require('./src/routes/index');
-const redirectRoutes = require('./src/routes/redirect.routes');
-const { generalLimiter } = require('./src/middlewares/rateLimiter.middleware'); // <-- IMPORT
+const connectDB = require('./config/db');
+const apiRoutes = require('./routes/index');
+const redirectRoutes = require('./routes/redirect.routes');
+const { generalLimiter } = require('./middlewares/rateLimiter.middleware'); // <-- IMPORT
 
 // Load các biến môi trường từ file .env
 dotenv.config();
