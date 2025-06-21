@@ -1,7 +1,6 @@
 // api/index.js
 
 const express = require('express');
-const { nanoid } = require('nanoid');
 
 const app = express();
 
