@@ -1,9 +1,9 @@
-// src/routes/index.js
-const express = require('express');
-const router = express.Router();
+// routes/index.js
+import express from 'express';
+import linkRoutes from './link.routes.js';
 
-const linkRoutes = require('./link.routes');
+const router = express.Router();
 
 router.use('/links', linkRoutes);
 
-module.exports = router;
+export default router;

@@ -1,13 +1,11 @@
-// src/routes/link.routes.js
+// routes/link.routes.js
+import express from 'express';
+import { createShortLink, getAllLinks } from '../controllers/link.controller.js';
+import { createLinkLimiter } from '../middlewares/rateLimiter.middleware.js';
 
-const express = require('express');
-const { createShortLink, getAllLinks } = require('../controllers/link.controller');
 const router = express.Router();
 
-// GET /api/links/ -> Lấy danh sách tất cả links
 router.get('/', getAllLinks);
+router.post('/shorten', createLinkLimiter, createShortLink);
 
-// POST /api/links/shorten -> Tạo link mới
-router.post('/shorten', createShortLink);
-
-module.exports = router;
+export default router;
