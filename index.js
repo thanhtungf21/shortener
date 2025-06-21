@@ -41,10 +41,14 @@ app.use('/api', generalLimiter, apiRoutes);
 app.use('/', redirectRoutes);
 
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
-
+// Only listen for connections when running locally.
+// Vercel's serverless environment handles the server lifecycle automatically.
+// Calling app.listen() in that environment causes the 'EADDRINUSE' error.
+if (!process.env.VERCEL) {
+    app.listen(PORT, () => {
+        console.log(`Server is running on http://localhost:${PORT}`);
+    });
+}
 export default app;
