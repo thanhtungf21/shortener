@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A simple and scalable URL shortener API built with Node.js, Express, and MongoDB, ready for Vercel deployment.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "npm run build:css && node index.js",
     "build:css": "tailwindcss -i ./styles/input.css -o ./public/output.css",

@@ -1,7 +1,7 @@
 // services/link.service.js
 
 import Link from '../models/link.model.js';
-import { nanoid } from 'nanoid'; // XÓA DÒNG IMPORT TĨNH NÀY
+// import { nanoid } from 'nanoid'; // XÓA DÒNG IMPORT TĨNH NÀY
 import { paginate } from '../utils/pagination.util.js';
 
 export const getAllLinks = async (query) => {
@@ -17,7 +17,7 @@ export const createShortLink = async (originalUrl, customCode) => {
     }
 
     // SỬ DỤNG LẠI DYNAMIC IMPORT()
-
+    const { nanoid } = await import('nanoid');
 
     let shortCode;
 
