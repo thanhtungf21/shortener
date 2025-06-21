@@ -22,7 +22,7 @@ export const createShortLink = async (originalUrl, customCode) => {
     let shortCode;
 
     if (customCode) {
-        const reservedWords = ['api', 'public', 'assets', 'css', 'js', 'img'];
+        const reservedWords = ['api', 'public', 'assets', 'css', 'js', 'img', 'favicon.ico'];
         if (reservedWords.includes(customCode.toLowerCase())) {
             const error = new Error(`Tên tùy chọn '${customCode}' không được phép.`);
             error.statusCode = 400;
