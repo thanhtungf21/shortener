@@ -16,30 +16,29 @@ const linksStore = {};
 // Endpoint 1: Tạo link rút gọn
 // POST /api/shorten
 app.post('/api/shorten', async (req, res) => {
-    const { originalUrl } = req.body;
+    try {
+        // Dùng import() động ở đây
+        const { nanoid } = await import('nanoid');
 
-    // Kiểm tra xem URL có hợp lệ không
-    if (!originalUrl || !originalUrl.startsWith('http')) {
-        return res.status(400).json({ error: 'Valid URL is required.' });
+        const { originalUrl } = req.body;
+
+        if (!originalUrl || !originalUrl.startsWith('http')) {
+            return res.status(400).json({ error: 'Valid URL is required.' });
+        }
+
+        const shortCode = nanoid(7);
+        //... (phần còn lại của code giữ nguyên)
+        linksStore[shortCode] = originalUrl;
+        const host = req.headers.host;
+        const protocol = host.includes('localhost') ? 'http' : 'https';
+        const shortUrl = `${protocol}://${host}/${shortCode}`;
+        res.status(200).json({ shortUrl });
+    } catch (error) {
+        // Thêm một trình xử lý lỗi cơ bản
+        console.error(error);
+        res.status(500).json({ error: 'An internal error occurred.' });
     }
-
-    // Tạo một mã ngắn (short code) ngẫu nhiên gồm 7 ký tự
-    const shortCode = nanoid(7);
-
-    // Lưu cặp mã ngắn và link gốc vào "cơ sở dữ liệu"
-    linksStore[shortCode] = originalUrl;
-
-    // Lấy domain của Vercel từ header request
-    const host = req.headers.host;
-    const protocol = host.includes('localhost') ? 'http' : 'https';
-    const shortUrl = `${protocol}://${host}/${shortCode}`;
-
-    console.log(`Created short link: ${shortUrl} -> ${originalUrl}`);
-
-    // Trả về link đã rút gọn
-    res.status(200).json({ shortUrl });
 });
-
 // Endpoint 2: Chuyển hướng (Redirect) từ link rút gọn
 // GET /:shortCode
 app.get('/:shortCode', (req, res) => {
