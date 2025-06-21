@@ -18,13 +18,14 @@ dotenv.config();
 
 const app = express();
 
-try {
-    await connectDB();
-} catch (error) {
-    console.error("Failed to connect to DB, exiting.", error);
-    process.exit(1);
-}
-
+(async () => {
+    try {
+        await connectDB();
+    } catch (error) {
+        console.error("Failed to connect to DB, exiting.", error);
+        process.exit(1);
+    }
+})();
 app.use(express.json());
 
 // --- SẮP XẾP LẠI ROUTE ---
