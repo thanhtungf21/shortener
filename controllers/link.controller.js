@@ -14,8 +14,9 @@ export const getAllLinks = async (req, res) => {
 
 export const createShortLink = async (req, res) => {
     try {
-        const { originalUrl } = req.body;
-        const newLink = await linkService.createShortLink(originalUrl);
+        // Lấy cả originalUrl và customCode từ body
+        const { originalUrl, customCode } = req.body;
+        const newLink = await linkService.createShortLink(originalUrl, customCode);
 
         const host = req.get('host');
         const protocol = req.protocol;
