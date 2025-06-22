@@ -10,7 +10,8 @@ import apiRoutes from './routes/index.js';
 import redirectRoutes from './routes/redirect.routes.js';
 import { generalLimiter } from './middlewares/rateLimiter.middleware.js';
 
-// Cấu hình để sử dụng __dirname trong ES Module
+// Cấu hình `__dirname` không còn cần thiết cho việc phục vụ tệp tĩnh nữa,
+// nhưng vẫn hữu ích nếu bạn cần nó ở nơi khác.
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -18,21 +19,23 @@ dotenv.config();
 
 const app = express();
 
-// Use top-level await to ensure the database is connected before the app starts.
-// This is crucial for stability in both local and serverless environments like Vercel.
+// Sử dụng top-level await để đảm bảo kết nối DB thành công trước khi app khởi động.
 try {
     await connectDB();
 } catch (error) {
     console.error("Failed to connect to DB, exiting.", error);
     process.exit(1);
 }
+
 app.use(express.json());
 
 // --- SẮP XẾP LẠI ROUTE ---
 
-// 1. Phục vụ các file tĩnh trong thư mục 'public' một cách trực tiếp
-// Khi server chạy từ thư mục gốc, Express sẽ tự động hiểu 'public' là thư mục con.
-app.use(express.static(path.join(__dirname, 'public')));
+// 1. Phục vụ các file tĩnh trong thư mục 'public'
+// Sử dụng process.cwd() để có đường dẫn gốc đáng tin cậy hơn trong môi trường Vercel.
+// Vercel sẽ tự động tìm thư mục 'public' ở gốc dự án và phục vụ nó.
+// Dòng này vẫn hữu ích cho việc phát triển ở môi trường local (máy tính cá nhân).
+app.use(express.static(path.join(process.cwd(), 'public')));
 
 // 2. Đăng ký các route API
 app.use('/api', generalLimiter, apiRoutes);
@@ -43,12 +46,12 @@ app.use('/', redirectRoutes);
 
 const PORT = process.env.PORT || 3000;
 
-// Only listen for connections when running locally.
-// Vercel's serverless environment handles the server lifecycle automatically.
-// Calling app.listen() in that environment causes the 'EADDRINUSE' error.
+// Chỉ lắng nghe kết nối khi chạy local.
+// Môi trường serverless của Vercel sẽ tự động quản lý vòng đời của server.
 if (!process.env.VERCEL) {
     app.listen(PORT, () => {
         console.log(`Server is running on http://localhost:${PORT}`);
     });
 }
+
 export default app;

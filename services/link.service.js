@@ -51,7 +51,9 @@ export const createShortLink = async (originalUrl, customCode) => {
 };
 
 export const getLinkByShortCode = async (shortCode) => {
-    const link = await Link.findOne({ shortCode });
+    // Find the link and atomically increment the click count.
+    // Using findOneAndUpdate is an atomic operation, which is safer for counters.
+    const link = await Link.findOneAndUpdate({ shortCode }, { $inc: { clicks: 1 } });
     if (!link) {
         const error = new Error('Không tìm thấy link rút gọn.');
         error.statusCode = 404;

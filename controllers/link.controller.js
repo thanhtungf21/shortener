@@ -26,6 +26,7 @@ export const createShortLink = async (req, res) => {
             originalUrl: newLink.originalUrl,
             shortUrl: shortUrl,
             shortCode: newLink.shortCode,
+            clicks: newLink.clicks,
         };
 
         sendSuccess(res, 201, data, 'Tạo link rút gọn thành công.');
