@@ -2,6 +2,7 @@
   "name": "vercel-shortener-api",
   "version": "1.0.0",
   "description": "A simple and scalable URL shortener API built with Node.js, Express, and MongoDB, ready for Vercel deployment.",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "pnpm run build:css && node index.js",
