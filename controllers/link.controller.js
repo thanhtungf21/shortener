@@ -39,10 +39,21 @@ export const createShortLink = async (req, res) => {
 export const redirectToOriginalUrl = async (req, res) => {
     try {
         const { shortCode } = req.params;
+
+        // Browsers often request favicon.ico. This is not a short link.
+        // We can handle it here to prevent a 404 error in the logs.
+        if (shortCode === 'favicon.ico') {
+            return res.status(204).send();
+        }
+
         const link = await linkService.getLinkByShortCode(shortCode);
         return res.redirect(301, link.originalUrl);
     } catch (error) {
-        console.error('Controller Error:', error);
+        // It's common for bots or users to try non-existent links.
+        // We shouldn't log these 404 "Not Found" errors as server errors.
+        if (error.statusCode !== 404) {
+            console.error('Controller Error:', error);
+        }
         sendError(res, error.statusCode || 500, error.message || 'Lỗi hệ thống.');
     }
 };
