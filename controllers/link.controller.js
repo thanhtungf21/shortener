@@ -1,59 +1,70 @@
-// controllers/link.controller.js
-import * as linkService from '../services/link.service.js';
-import { sendSuccess, sendError } from '../utils/response.util.js';
+import * as linkService from "../services/link.service.js";
+import Response from "../utils/response.util.js"; // 1. Import Response class
 
 export const getAllLinks = async (req, res) => {
-    try {
-        const result = await linkService.getAllLinks(req.query);
-        sendSuccess(res, 200, result, 'Lấy danh sách link thành công.');
-    } catch (error) {
-        console.error('Controller Error:', error);
-        sendError(res, error.statusCode || 500, error.message || 'Lỗi hệ thống.');
-    }
+  const response = new Response(res); // 2. Khởi tạo response
+  try {
+    const result = await linkService.getAllLinks(req.query);
+    // 3. Sử dụng ok()
+    return response.ok(result, "Lấy danh sách link thành công.");
+  } catch (error) {
+    console.error("Controller Error:", error);
+    // 4. Sử dụng internalServerError() cho lỗi chung
+    return response.internalServerError(error.message || "Lỗi hệ thống.");
+  }
 };
 
 export const createShortLink = async (req, res) => {
-    try {
-        // Lấy cả originalUrl và customCode từ body
-        const { originalUrl, customCode } = req.body;
-        const newLink = await linkService.createShortLink(originalUrl, customCode);
+  const response = new Response(res); // 2. Khởi tạo response
+  try {
+    const { originalUrl, customCode } = req.body;
+    const newLink = await linkService.createShortLink(originalUrl, customCode);
 
-        const host = req.get('host');
-        const protocol = req.protocol;
-        const shortUrl = `${protocol}://${host}/${newLink.shortCode}`;
+    const host = req.get("host");
+    const protocol = req.protocol;
+    const shortUrl = `${protocol}://${host}/${newLink.shortCode}`;
 
-        const data = {
-            originalUrl: newLink.originalUrl,
-            shortUrl: shortUrl,
-            shortCode: newLink.shortCode,
-            clicks: newLink.clicks,
-        };
-
-        sendSuccess(res, 201, data, 'Tạo link rút gọn thành công.');
-    } catch (error) {
-        console.error('Controller Error:', error);
-        sendError(res, error.statusCode || 500, error.message || 'Lỗi hệ thống.');
+    const data = {
+      originalUrl: newLink.originalUrl,
+      shortUrl: shortUrl,
+      shortCode: newLink.shortCode,
+      clicks: newLink.clicks,
+    };
+    // 3. Sử dụng created()
+    return response.created(data, "Tạo link rút gọn thành công.");
+  } catch (error) {
+    console.error("Controller Error:", error);
+    // 4. Xử lý lỗi linh hoạt
+    if (error.statusCode === 400) {
+      return response.badRequest(error.message);
     }
+    return response.internalServerError(error.message || "Lỗi hệ thống.");
+  }
 };
 
 export const redirectToOriginalUrl = async (req, res) => {
-    try {
-        const { shortCode } = req.params;
+  const response = new Response(res); // 2. Khởi tạo response
+  try {
+    const { shortCode } = req.params;
 
-        // Browsers often request favicon.ico. This is not a short link.
-        // We can handle it here to prevent a 404 error in the logs.
-        if (shortCode === 'favicon.ico') {
-            return res.status(204).send();
-        }
-
-        const link = await linkService.getLinkByShortCode(shortCode);
-        return res.redirect(301, link.originalUrl);
-    } catch (error) {
-        // It's common for bots or users to try non-existent links.
-        // We shouldn't log these 404 "Not Found" errors as server errors.
-        if (error.statusCode !== 404) {
-            console.error('Controller Error:', error);
-        }
-        sendError(res, error.statusCode || 500, error.message || 'Lỗi hệ thống.');
+    if (shortCode === "favicon.ico") {
+      // 3. Sử dụng noContent() cho status 204
+      return response.noContent();
     }
+
+    const link = await linkService.getLinkByShortCode(shortCode);
+
+    // LƯU Ý: res.redirect là một hành động đặc biệt, không phải là JSON response.
+    // Vì vậy, chúng ta giữ nguyên nó. Class Response của chúng ta chỉ dành cho API trả về JSON.
+    return res.redirect(301, link.originalUrl);
+  } catch (error) {
+    if (error.statusCode !== 404) {
+      console.error("Controller Error:", error);
+    }
+    // 4. Xử lý lỗi 404 và các lỗi khác một cách rõ ràng
+    if (error.statusCode === 404) {
+      return response.notFound(error.message);
+    }
+    return response.internalServerError(error.message || "Lỗi hệ thống.");
+  }
 };
