@@ -15,8 +15,19 @@ export const registerUser = async (req, res) => {
     }
 
     const registeredUser = await authService.register({ email, password });
+
+    res.cookie("token", registeredUser.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 1000, // 1 giờ
+    });
+
     // 4. Sử dụng phương thức created() cho status 201
-    return response.created(registeredUser, "User registered successfully");
+    return response.created(
+      { _id: registeredUser._id, email: registeredUser.email },
+      "User registered successfully"
+    );
   } catch (error) {
     console.error(error);
     // 5. Xử lý lỗi linh hoạt
@@ -41,8 +52,19 @@ export const loginUser = async (req, res) => {
     }
 
     const loggedInUser = await authService.login({ email, password });
+
+    res.cookie("token", loggedInUser.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 1000, // 1 giờ
+    });
+
     // 4. Sử dụng phương thức ok() cho status 200
-    return response.ok(loggedInUser, "Login successful");
+    return response.ok(
+      { _id: loggedInUser._id, email: loggedInUser.email },
+      "Login successful"
+    );
   } catch (error) {
     console.error(error);
     // 5. Xử lý lỗi linh hoạt

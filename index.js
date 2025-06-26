@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import morgan from "morgan"; // <-- 1. Import morgan
+import cookieParser from "cookie-parser";
 
 import connectDB from "./config/db.js";
 import apiRoutes from "./routes/index.js";
@@ -31,6 +32,7 @@ try {
 }
 
 app.use(express.json());
+app.use(cookieParser());
 
 // 2. Sử dụng morgan middleware để ghi log
 // Chỉ sử dụng trong môi trường dev để tránh làm chậm production
