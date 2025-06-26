@@ -1,5 +1,6 @@
 import User from "../models/User.model.js";
 import jwt from "jsonwebtoken";
+import AppError from "../utils/appError.util.js";
 
 // Helper function to generate JWT token
 const generateToken = (id) => {
@@ -21,16 +22,12 @@ class AuthService {
 
     const userExists = await User.findOne({ $or: [{ email }] });
     if (userExists) {
-      const error = new Error("User with that email already exists");
-      error.statusCode = 400;
-      throw error;
+      throw new AppError("User with that email already exists", 400);
     }
 
     const user = await User.create({ email, password });
-    if (!user) {
-      const error = new Error("Invalid user data, could not create user");
-      error.statusCode = 400;
-      throw error;
+    if (!user || !(await user.matchPassword(password))) {
+      throw new AppError("Invalid credentials", 401);
     }
 
     const token = generateToken(user._id);
