@@ -28,7 +28,7 @@ const __dirname = path.dirname(__filename);
 const allowedOrigins = [
   "http://localhost:3000", // Cổng mặc định của bạn
   "http://localhost:5173", // Thêm cổng của Vite/React frontend
-  "https://tungnt2.com.vn", // Domain khi deploy
+  "https://tungnt2.name.vn", // Domain khi deploy
 ];
 // 1. Bảo mật
 // Sử dụng Helmet để thiết lập các HTTP Headers bảo mật
