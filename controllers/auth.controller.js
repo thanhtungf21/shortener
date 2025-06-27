@@ -57,7 +57,7 @@ export const loginUser = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 60 * 60 * 1000, // 1 giờ
+      maxAge: 3 * 24 * 60 * 60 * 1000, // 1 giờ
     });
 
     // 4. Sử dụng phương thức ok() cho status 200
@@ -73,4 +73,20 @@ export const loginUser = async (req, res) => {
     }
     return response.internalServerError("Server error during login");
   }
+};
+
+export const logoutUser = (req, res) => {
+  const response = new Response(res);
+
+  // Gửi một cookie mới tên là 'token' với nội dung rỗng
+  // và thời gian hết hạn trong quá khứ để xóa cookie hiện tại trên trình duyệt.
+  res.cookie("token", "", {
+    httpOnly: true,
+    expires: new Date(0), // Đặt thời gian hết hạn là một thời điểm trong quá khứ
+    secure: process.env.NODE_ENV === "production", // Phải khớp với cài đặt khi đăng nhập
+    sameSite: "strict", // Phải khớp với cài đặt khi đăng nhập
+  });
+
+  // Trả về thông báo thành công.
+  return response.ok(null, "User logged out successfully.");
 };

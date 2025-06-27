@@ -1,6 +1,10 @@
 // routes/auth.routes.js
 import express from "express";
-import { registerUser, loginUser } from "../controllers/auth.controller.js";
+import {
+  registerUser,
+  loginUser,
+  logoutUser,
+} from "../controllers/auth.controller.js";
 // Import các middleware validation
 import {
   validateRegistration,
@@ -11,5 +15,5 @@ const router = express.Router();
 
 router.post("/register", validateRegistration, registerUser);
 router.post("/login", validateLogin, loginUser);
-
+router.post("/logout", logoutUser);
 export default router;
