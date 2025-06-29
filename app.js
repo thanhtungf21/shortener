@@ -16,6 +16,7 @@ import {
   errorHandler,
 } from "./middlewares/errorHandler.middleware.js";
 import cookieParser from "cookie-parser"; // <-- 1. Import cookie-parser
+import config from "./config/config.js";
 
 // import config from "./config/config.js";
 
@@ -25,11 +26,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // --- CẤU HÌNH MIDDLEWARE ---
-const allowedOrigins = [
+const devAllowedOrigins = [
   "http://localhost:3000", // Cổng mặc định của bạn
   "http://localhost:5173", // Thêm cổng của Vite/React frontend
-  "https://tungnt2.name.vn", // Domain khi deploy
+  // "https://tungnt2.name.vn", // Domain khi deploy
 ];
+const prodAllowedOrigins = [
+  "https://tungnt2.name.vn", // Domain khi deploy
+  "https://shortener-tungnt.vercel.app",
+];
+
 // 1. Bảo mật
 // Sử dụng Helmet để thiết lập các HTTP Headers bảo mật
 app.use(helmet());
@@ -50,7 +56,9 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200,
 };
-app.use(cors(corsOptions));
+app.use(
+  cors(config.env == "development" ? devAllowedOrigins : prodAllowedOrigins)
+);
 
 // 2. Parser và Logging
 app.use(express.json()); // Middleware để parse JSON body
