@@ -15,10 +15,8 @@ import {
   notFound,
   errorHandler,
 } from "./middlewares/errorHandler.middleware.js";
-import cookieParser from "cookie-parser"; // <-- 1. Import cookie-parser
+import cookieParser from "cookie-parser";
 import config from "./config/config.js";
-
-// import config from "./config/config.js";
 
 // --- KHỞI TẠO APP VÀ CÁC BIẾN CẦN THIẾT ---
 const app = express();
@@ -26,44 +24,46 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // --- CẤU HÌNH MIDDLEWARE ---
+
+// 1. Bảo mật
+// Sử dụng Helmet để thiết lập các HTTP Headers bảo mật
+app.use(helmet());
+
+// Cấu hình CORS động dựa trên môi trường
 const devAllowedOrigins = [
   "http://localhost:3000", // Cổng mặc định của bạn
-  "http://localhost:5173", // Thêm cổng của Vite/React frontend
-  // "https://tungnt2.name.vn", // Domain khi deploy
+  "http://localhost:5173", // Cổng của Vite/React frontend
 ];
 const prodAllowedOrigins = [
   "https://tungnt2.name.vn", // Domain khi deploy
   "https://shortener-tungnt.vercel.app",
 ];
 
-// 1. Bảo mật
-// Sử dụng Helmet để thiết lập các HTTP Headers bảo mật
-app.use(helmet());
+// Chọn danh sách origin phù hợp với môi trường hiện tại
+const allowedOrigins =
+  config.env === "development" ? devAllowedOrigins : prodAllowedOrigins;
 
-// Cấu hình CORS
 const corsOptions = {
   origin: (origin, callback) => {
-    // Cho phép các request không có origin (ví dụ: Postman, mobile apps)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg =
-        "The CORS policy for this site does not allow access from the specified Origin.";
-      return callback(new Error(msg), false);
+    // Cho phép các request không có origin (ví dụ: Postman, mobile apps, hoặc truy cập trực tiếp)
+    // Hoặc nếu origin có trong danh sách được phép
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
     }
-    return callback(null, true);
   },
-  credentials: true,
+  credentials: true, // Cho phép gửi cookie qua CORS
   optionsSuccessStatus: 200,
 };
-app.use(
-  cors(config.env == "development" ? devAllowedOrigins : prodAllowedOrigins)
-);
+
+// Sử dụng middleware CORS với cấu hình đã định nghĩa
+app.use(cors(corsOptions));
 
 // 2. Parser và Logging
 app.use(express.json()); // Middleware để parse JSON body
 app.use(cookieParser());
-if (process.env.NODE_ENV === "development") {
+if (config.env === "development") {
   app.use(morgan("dev")); // Ghi log request ở môi trường dev
 }
 
