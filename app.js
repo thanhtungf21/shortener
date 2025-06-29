@@ -24,6 +24,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // --- CẤU HÌNH MIDDLEWARE ---
+app.set("trust proxy", 1);
 
 // 1. Bảo mật
 // Sử dụng Helmet để thiết lập các HTTP Headers bảo mật
