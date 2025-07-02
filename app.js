@@ -60,6 +60,7 @@ const corsOptions = {
 
 // Sử dụng middleware CORS với cấu hình đã định nghĩa
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 // 2. Parser và Logging
 app.use(express.json()); // Middleware để parse JSON body
