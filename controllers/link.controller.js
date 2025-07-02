@@ -56,7 +56,7 @@ export const redirectToOriginalUrl = async (req, res) => {
 
     // LƯU Ý: res.redirect là một hành động đặc biệt, không phải là JSON response.
     // Vì vậy, chúng ta giữ nguyên nó. Class Response của chúng ta chỉ dành cho API trả về JSON.
-    return res.redirect(301, link.originalUrl);
+    return res.redirect(302, link.originalUrl);
   } catch (error) {
     if (error.statusCode !== 404) {
       console.error("Controller Error:", error);
