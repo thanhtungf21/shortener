@@ -12,7 +12,7 @@ const consoleFormat = combine(
   printf((info) => `[${info.timestamp}] ${info.level}: ${info.message}`)
 );
 
-// Định dạng log cho file (thường là JSON để dễ phân tích)
+// Định dạng log cho file (sẽ chỉ dùng khi không ở trên Vercel)
 const fileFormat = combine(
   timestamp(),
   printf((info) =>
@@ -25,19 +25,20 @@ const fileFormat = combine(
 );
 
 const transports = [
-  // Luôn ghi log ra console
+  // Luôn ghi log ra console, Vercel sẽ tự động thu thập log này
   new winston.transports.Console({
-    level: config.env === "development" ? "debug" : "info", // Ghi tất cả các cấp độ ở dev, chỉ ghi info trở lên ở prod
+    level: config.env === "development" ? "debug" : "info",
     format: consoleFormat,
   }),
 ];
 
-// Chỉ ghi log ra file ở môi trường production
-if (config.env === "production") {
+// *** THAY ĐỔI QUAN TRỌNG Ở ĐÂY ***
+// Chỉ ghi log ra file khi ở môi trường production VÀ KHÔNG phải trên Vercel
+if (config.env === "production" && !config.isVercel) {
   transports.push(
     new winston.transports.File({
       filename: "logs/error.log",
-      level: "error", // Chỉ ghi những lỗi nghiêm trọng
+      level: "error",
       format: fileFormat,
       maxsize: 5242880, // 5MB
       maxFiles: 5,
