@@ -1,13 +1,16 @@
 // config/db.js
 import mongoose from "mongoose";
-import config from "./config.js"; // Import config
+import config from "./config.js";
+import logger from "../utils/logger.util.js";
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(config.mongoUri); // Sử dụng URI từ config
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    const conn = await mongoose.connect(config.mongoUri);
+    // Thay thế console.log
+    logger.info(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error(`Error connecting to MongoDB: ${error.message}`);
+    // Thay thế console.error
+    logger.error(`Error connecting to MongoDB: ${error.message}`);
     process.exit(1);
   }
 };

@@ -1,38 +1,32 @@
 // index.js
-
 import dotenv from "dotenv";
-import app from "./app.js"; // <-- 1. Import app từ file app.js
-import connectDB from "./config/db.js"; // <-- 2. Import hàm kết nối DB
-import config from "./config/config.js"; // <-- Import
+import app from "./app.js";
+import connectDB from "./config/db.js";
+import config from "./config/config.js";
+import logger from "./utils/logger.util.js";
 
-// 3. Tải các biến môi trường từ file .env
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
-// Hàm chính để khởi động server
 const startServer = async () => {
   try {
-    // 4. Kết nối đến cơ sở dữ liệu
-    await connectDB(config.mongoUri); // Truyền URI vào
+    await connectDB(config.mongoUri);
 
-    // 5. Khởi động server chỉ khi không chạy trên Vercel
-    // Vercel sẽ tự quản lý việc khởi chạy server
     if (!config.isVercel) {
       app.listen(config.port, () => {
-        console.log(`Server is running on http://localhost:${config.port}`);
-        console.log(`Environment: ${config.env}`);
+        // Thay thế console.log
+        logger.info(`Server is running on http://localhost:${config.port}`);
+        logger.info(`Environment: ${config.env}`);
       });
     }
   } catch (error) {
-    console.error("Failed to start the server.", error);
-    process.exit(1); // Thoát tiến trình nếu không thể khởi động server
+    // Thay thế console.error
+    logger.error("Failed to start the server.", error);
+    process.exit(1);
   }
 };
 
-// Gọi hàm để bắt đầu
 startServer();
 
-// 6. Export app cho Vercel
-// Vercel cần export mặc định của đối tượng app để hoạt động
 export default app;
